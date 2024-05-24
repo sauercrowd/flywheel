@@ -1,3 +1,6 @@
 (defpackage :flywheel
-  (:use :cl)
-  (:export))
+  (:use :cl :alexandria)
+  (:export
+           ; controller
+           :defaction
+           :defcontroller))
