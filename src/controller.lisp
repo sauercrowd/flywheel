@@ -6,8 +6,23 @@
    (before :initform (make-hash-table :test 'equal) :accessor before)
    (after :initform (make-hash-table :test 'equal) :accessor before)))
 
+(defclass request-context ()
+  ((state :initform (make-hash-table :test 'equal) :accessor state)
+   (template :initform 'application :accessor template)
+   (request-env :initarg :request-env :accessor request-env)))
+
 
 (defparameter *controllers* (make-hash-table :test 'equal))
+
+(defvar *request-context* nil "hold state within a request context")
+
+(defun @< (key)
+  (gethash key (slot-value *request-context* 'state)))
+
+(defun @= (key value)
+  (setf (gethash key (slot-value *request-context* 'state))
+	value))
+
 
 (defun hook-atom-to-symbol (hook)
   (case hook
@@ -40,13 +55,20 @@
     (setf (gethash action actions) handler)))
 
 (defmacro defaction (controller action args &rest body)
-  `(create-action ',controller ,action (lambda ,args ,@body)))
+  `(create-action ,controller ,action (lambda ,args ,@body)))
 
+(defun call-action (controller-symbol action-symbol req)
+  (let* ((controller (gethash controller-symbol *controllers*)))
+    (if controller
+	(let ((action
+		(gethash action-symbol
+			 (slot-value controller 'actions))))
+	  (if action
+	      (apply action (list req))
+	      nil))
+	    nil)))
 
-(defun render-view (view &rest body)
-  (format nil "view rendered: ~a" view))
+;(defun redirect (url)
+;  (format nil "redirect: ~a" url))
 
-
-(defun redirect (url)
-  (format nil "redirect: ~a" url))
 

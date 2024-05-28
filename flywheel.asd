@@ -3,7 +3,8 @@
   :author "Jonas Otten"
   :license "MIT"
   :components ((:module "src"
-                        :components ((:file "package")
+		:components ((:file "package")
+			     (:file "router")
                                      (:file "server")
                                      (:file "controller"))))
   :depends-on ("clack"

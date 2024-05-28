@@ -67,8 +67,6 @@
             parts)))
 
 
-
-
 (defun compare-route-parts (actual-path candidate-path)
   (let ((params (make-hash-table :test 'equal))
         (merged-parts (zip-and-extend actual-path candidate-path)))
@@ -87,7 +85,7 @@
                                          (- 0 (hash-table-count params)))))))
 
 (defun find-route-candidates (method path)
-  (let ((path-parts (parse-route-path path)))
+  (let ((path-parts (strip-leading-and-trailing-nil (parse-route-path path))))
     (remove-if-not (lambda (value)
                      (and
                        (first value)
@@ -113,37 +111,27 @@
 (defun find-route (method path)
   (let ((target-route-element (find-target-route-element method path)))
     (if target-route-element
-       (list  (first (first target-route-element)) (second target-route-element))
-        nil)))
+	(list  (first (first target-route-element)) (second target-route-element))
+	nil)))
 
-(defrouter
-  (:get "/posts" posts :index)
-  (:get "/posts/:id" posts :get))
-  (:get "/posts/2" posts :get))
-
-(find-route :get "posts/1")
 
 (defun create-route (method path controller action)
   (let* ((key (create-route-key method path)))
-   (setf (gethash key *routes*)
-         (make-instance 'route
-                        :method method
-                        :path (strip-leading-and-trailing-nil
+    (setf (gethash key *routes*)
+	  (make-instance 'route
+			 :method method
+			 :path (strip-leading-and-trailing-nil
                                 (parse-route-path path))
-                        :controller controller
-                        :action action))))
-
+			 :controller controller
+			 :action action))))
 
 (defmacro defroute (route)
   (destructuring-bind (method path controller action) route
-   `(create-route ,method ,path ',controller ,action)))
-
-
+    `(create-route ,method ,path ,controller ,action)))
 
 
 (defmacro defrouter (&rest routes)
   `(progn
      ,@(mapcar (lambda (route)
-                 `(defroute ,route)) routes)))
-
-
+                 `(defroute ,route))
+	       routes)))
