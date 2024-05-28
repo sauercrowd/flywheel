@@ -5,11 +5,12 @@
 
 (defmacro deftemplate (key args html-value)
   `(setf (gethash ,key *templates*)
-	 (lambda ,args ',html-value)))
+	 (lambda ,args
+	   (render-html ,html-value))))
 
 
-(defun render-template (key)
-  (let ((template (gethash *templates* key)))
+(defun render-template (key args)
+  (let ((template (gethash key *templates*)))
     (if template
-	(render-html template)
+	(apply template args)
 	nil)))

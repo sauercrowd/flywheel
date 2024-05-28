@@ -3,7 +3,7 @@
 
 (deftemplate 'application (body)
     (:html
-     (:body (:k 1) body)))
+     (:body '(:k 1) body)))
 
 
 (defrouter
@@ -22,3 +22,13 @@
 
 (defview 'posts :get ()
   (format nil "hello world ~a" (@< :params)))
+
+
+(render-template 'application '("hello"))
+
+;; todo
+;; setup default template and use it for view
+;; serve static assets
+;; partials
+;; database
+;; eval refresh
