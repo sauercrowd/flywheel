@@ -9,6 +9,7 @@
 (defclass request-context ()
   ((state :initform (make-hash-table :test 'equal) :accessor state)
    (template :initform 'application :accessor template)
+   (headers :initform '(:content-type "text/html") :accessor headers)
    (request-env :initarg :request-env :accessor request-env)))
 
 
@@ -46,7 +47,7 @@
                        (append hook-action fn))))))
 
 (defmacro defcontroller (name &rest body)
-  `(create-controller ',name (list ,@(loop for (hook action fn) in body
+  `(create-controller ,name (list ,@(loop for (hook action fn) in body
                                            collect `(list ,hook ,action ,fn)))))
 
 (defun create-action (controller action handler)
@@ -57,6 +58,11 @@
 (defmacro defaction (controller action args &rest body)
   `(create-action ,controller ,action (lambda ,args ,@body)))
 
+(defun make-html-controller-response (html-response)
+  (list 200
+	 (slot-value *request-context* 'headers)
+	 (list html-response)))
+
 (defun call-action (controller-symbol action-symbol req)
   (let* ((controller (gethash controller-symbol *controllers*)))
     (if controller
@@ -64,7 +70,8 @@
 		(gethash action-symbol
 			 (slot-value controller 'actions))))
 	  (if action
-	      (apply action (list req))
+	      (make-html-controller-response
+	       (apply action (list req)))
 	      nil))
 	    nil)))
 

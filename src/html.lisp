@@ -26,8 +26,8 @@
 	
 
 
-(render-html
-  (:html
-   '()
-     (:header () "hello")
-     (:body '(:k 1 :b 2) "inner body")))
+;;(render-html
+;;  (:html
+;;   '()
+;;     (:header () "hello")
+;;     (:body '(:k 1 :b 2) "inner body")))

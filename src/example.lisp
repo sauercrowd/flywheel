@@ -15,13 +15,13 @@
 
 (defaction 'posts :get (req)
   (let ((params (car req)))
-    (@= :params params)
-    (list 200 nil (list
-	(render-view 'posts :get)))))
+    (@= :params "hey what's going on")
+    (render-view 'posts :get)))
 				
 
 (defview 'posts :get ()
-  (format nil "hello world ~a" (@< :params)))
+  (format nil "hello world ~a!!" (@< :params)))
+  
 
 
 (render-template 'application '("hello"))

@@ -27,30 +27,35 @@
 (defun maybe-get-fd (port)
   (let ((fds (cl-ppcre:split ";" (uiop:getenv "SERVER_STARTER_PORT"))))
     (if fds
-        (let* ((regex (format nil "~a=" port))
-               (match (find-if
-                        (lambda (fd)
-                            (cl-ppcre:scan regex fd))
-                        fds)))
-          (if match
-            (multiple-value-bind
-                (int _)
-                (parse-integer
-                  (second
-                    (cl-ppcre:split "=" match)))
-              int)
-              nil))
-        nil)))
+	(let* ((regex (format nil "~a=" port))
+	       (match (find-if
+		       (lambda (fd)
+			 (cl-ppcre:scan regex fd))
+		       fds)))
+	  (if match
+	      (multiple-value-bind
+		    (int _)
+		  (parse-integer
+		   (second
+		    (cl-ppcre:split "=" match)))
+		int)
+	      nil))
+	nil)))
 
 ;;(apply (gethash :index (slot-value (gethash 'posts *controllers*) 'actions)) '(1))
 ;;(handle-route-match (gethash 'posts *routes*) ())
 
-(defparameter *server*
-  (let ((fd (maybe-get-fd 8080)))
-      (clack:clackup
-        (lambda (env)
-          (funcall 'handler env))
-        :server :woo
-        :fd fd)))
+(defparameter *server* nil)
 
-(clack:stop *server*)
+
+(defun start-server ()
+  (setf *server* 
+	(let ((fd (maybe-get-fd 8080)))
+	  (clack:clackup
+	   (lambda (env)
+	     (funcall 'handler env))
+	   :server :woo
+	   :fd fd))))
+
+(defun stop-server ()
+  (clack:stop *server*))
