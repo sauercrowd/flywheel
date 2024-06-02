@@ -6,7 +6,7 @@
 (defmacro deftemplate (key args html-value)
   `(setf (gethash ,key *templates*)
 	 (lambda ,args
-	   (render-html ,html-value))))
+	   ,html-value)))
 
 
 (defun render-template (key args)

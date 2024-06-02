@@ -8,6 +8,7 @@
 			     (:file "template")
 			     (:file "router")
                              (:file "server")
+                             (:file "static-files")
                              (:file "controller")
 			     (:file "view"))))
   :depends-on ("clack"

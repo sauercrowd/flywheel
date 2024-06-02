@@ -8,22 +8,21 @@
 
 (defclass request-context ()
   ((state :initform (make-hash-table :test 'equal) :accessor state)
-   (template :initform 'application :accessor template)
+   (template :initform :application :accessor template)
    (headers :initform '(:content-type "text/html") :accessor headers)
    (request-env :initarg :request-env :accessor request-env)))
 
 
 (defparameter *controllers* (make-hash-table :test 'equal))
 
-(defvar *request-context* nil "hold state within a request context")
+;;(defvar *request-context* nil "hold state within a request context")
 
-(defun @< (key)
+(defun @set (key)
   (gethash key (slot-value *request-context* 'state)))
 
-(defun @= (key value)
-  (setf (gethash key (slot-value *request-context* 'state))
+(defun @get (key value)
+ (setf (gethash key (slot-value *request-context* 'state))
 	value))
-
 
 (defun hook-atom-to-symbol (hook)
   (case hook

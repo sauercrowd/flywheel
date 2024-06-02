@@ -15,20 +15,20 @@
 
 (defaction 'posts :get (req)
   (let ((params (car req)))
-    (@= :params "hey what's going on")
+    (@set :params "hey what's going on")
     (render-view 'posts :get)))
 				
 
 (defview 'posts :get ()
-  (format nil "hello world ~a!!" (@< :params)))
+  (format nil "hello world ~a!!" (@get :params)))
   
 
 
 (render-template 'application '("hello"))
 
 ;; todo
-;; setup default template and use it for view
-;; serve static assets
-;; partials
-;; database
-;; eval refresh
+;; [x] setup default template and use it for view 
+;; [ ] serve static assets
+;; [ ] partials
+;; [ ] database
+;; [ ] eval refresh

@@ -11,18 +11,22 @@
 	      (call-action controller action
 			   (list params env)))))
 
+(defvar *request-context* nil)
+
 (defun handler (env)
   (let* ((path (getf env :path-info))
          (method (getf env :request-method))
 	 (target-route (find-route method path))
 	 (*request-context* (make-instance 'request-context)))
-    (if target-route
-	(let ((response
-		(handle-route-match target-route env)))
-	  (if response
-	      response
-	      (make-response 404 "not found")))
-	(make-response 404  "not found"))))
+    (if (uiop:string-prefix-p  "/static/" path)
+	(handle-static-file path)
+	(if target-route
+	    (let ((response
+		    (handle-route-match target-route env)))
+	    (if response
+		response
+		(make-response 404 "not found")))
+	    (make-response 404  "not found")))))
 
 (defun maybe-get-fd (port)
   (let ((fds (cl-ppcre:split ";" (uiop:getenv "SERVER_STARTER_PORT"))))
@@ -42,19 +46,23 @@
 	      nil))
 	nil)))
 
-;;(apply (gethash :index (slot-value (gethash 'posts *controllers*) 'actions)) '(1))
-;;(handle-route-match (gethash 'posts *routes*) ())
-
 (defparameter *server* nil)
 
+(defparameter *server-address* "127.0.0.1")
+(defparameter *use-thread* t)
 
 (defun start-server ()
   (setf *server* 
 	(let ((fd (maybe-get-fd 8080)))
+	;; Disable threads
 	  (clack:clackup
 	   (lambda (env)
 	     (funcall 'handler env))
 	   :server :woo
+	   :use-thread *use-thread*
+	   :port 8080
+	   :address *server-address*
+	   :debug t
 	   :fd fd))))
 
 (defun stop-server ()
