@@ -1,7 +1,7 @@
 (in-package :flywheel)
 
 (defun render-single-tag (tag keys inner)
-    (format nil "<~(~a~)~{ \~(~a~)\=\"~a\"~}>~a</~(~a~)>" tag keys inner tag))
+    (format nil "<~(~a~)~{ \~(~a~)\=\"~a\"~}>~a</~(~a~)>" tag keys (or inner "") tag))
 
 (defun process-single-tag (html)
   (if (listp html)
@@ -21,6 +21,11 @@
 
 (defmacro render-html (&body htmls)
   (render-html-recursively htmls))
+
+
+(defun csrf-html-tag ()
+  (let ((lack-session (slot-value *request-context* 'lack-session)))
+    (lack/middleware/csrf:csrf-html-tag lack-session)))
 	
 
 

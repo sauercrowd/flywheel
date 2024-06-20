@@ -132,6 +132,7 @@
 
 (defmacro defrouter (&rest routes)
   `(progn
+     (setf *routes* (make-hash-table :test 'equal))
      ,@(mapcar (lambda (route)
                  `(defroute ,route))
 	       routes)))
